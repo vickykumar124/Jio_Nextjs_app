@@ -5,12 +5,12 @@ const app = express();
 const UserModel = require("./userModel");
 const dotenv = require("dotenv")
 const cookieparser = require("cookie-parser");
-const emailSender = require("./DynamicEmailSender");
+const sendEmail = require("./services/emailService");
 dotenv.config();
 
 // env ke variables
 /*****************db connection***************/
-const dbLink = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.mu8hadf.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
+const dbLink = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASSWORD}@cluster0.tb8nzgu.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 mongoose.connect(dbLink)
     .then(function (connection) {
         console.log("connected to db")
