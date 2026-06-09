@@ -6,6 +6,7 @@ const UserModel = require("./userModel");
 const dotenv = require("dotenv")
 const cookieparser = require("cookie-parser");
 const sendEmail = require("./services/emailService");
+const jwt = require("jsonwebtoken");
 dotenv.config();
 
 // env ke variables
@@ -42,6 +43,13 @@ async function signupHandler(req, res) {
             })
         }
         const newUser = await UserModel.create(userObject);
+        await sendEmail(
+  "./templates/welcome.html",
+  newUser.email,
+  {
+    name: newUser.name
+  }
+);
         // hash the new user password
         // send a response 
         res.status(201).json({
@@ -83,7 +91,11 @@ async function loginHandler(req, res) {
         }
 
         // token create
-        const authToken = await promisdiedJWTsign({ id: user["_id"] }, process.env.JWT_SECRET_KEY);
+       const authToken = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET_KEY,
+    { expiresIn: "1d" }
+);
         // // token -> cookies
         res.cookie("jwt", authToken, {
             maxAge: 1000 * 60 * 60 * 24,
@@ -149,15 +161,23 @@ async function forgetPasswordHandler(req, res) {
         //  send email
         // email -> req.body.email
         // otp -> add 
+const templateData = {
+    name: user.name,
+    otp: user.otp
+};
 
-        res.status(200).json({
-            message: "otp is send successfully",
-            status: "success",
-            otp: otp,
-            resetURL: `http:localhost:3000/api/auth/resetPassword/${user["_id"]}`
-        })
-        const templateData = { name: user.name, otp: user.otp }
-        await emailSender("./templates/otp.html", user.email, templateData);
+await sendEmail(
+    "./templates/otp.html",
+    user.email,
+    templateData
+);
+
+res.status(200).json({
+    message: "otp is send successfully",
+    status: "success",
+    otp: otp,
+    resetURL: `http://localhost:3000/api/auth/resetPassword/${user["_id"]}`
+});
     } catch (err) {
         console.log("err", err);
         res.status(500).json({
