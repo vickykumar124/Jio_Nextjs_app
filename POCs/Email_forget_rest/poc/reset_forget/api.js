@@ -7,6 +7,8 @@ const dotenv = require("dotenv")
 const cookieparser = require("cookie-parser");
 const sendEmail = require("./services/emailService");
 const jwt = require("jsonwebtoken");
+const { getCurrentMovies, topRated } =
+  require("./controller/movieController");
 dotenv.config();
 
 // env ke variables
@@ -262,14 +264,11 @@ async function resetPasswordHandler(req, res) {
 }
 
 
+
 // upcomig implemnet
 
-// app.get("/api/movies/currentPlaying", getCurrentMovies);
-// app.get("/api/movies/topRated", getTopRatedMovies);
-
-
-
-
+app.get("/api/movies/currentPlaying", getCurrentMovies);
+app.get("/api/movies/topRated", topRated);
 
 
 
